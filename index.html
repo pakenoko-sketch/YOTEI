@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>My Calendar</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="toprow">
+      <div>
+        <div class="brand">MY CALENDAR</div>
+        <div class="month-title" id="monthTitle">2026年10月</div>
+      </div>
+      <button class="iconbtn" id="openAddTop" aria-label="予定を追加">＋</button>
+    </div>
+    <div class="toprow" style="margin-top:13px">
+      <div class="monthnav">
+        <button id="prevMonth" aria-label="前の月">‹</button>
+        <button id="nextMonth" aria-label="次の月">›</button>
+      </div>
+      <button class="todaybtn" id="goToday">今日に戻る</button>
+    </div>
+  </header>
+
+  <section class="calendar-card" aria-label="月間カレンダー">
+    <div class="weekdays">
+      <div>日</div><div>月</div><div>火</div><div>水</div>
+      <div>木</div><div>金</div><div>土</div>
+    </div>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section class="section">
+    <div class="sectionhead">
+      <div>
+        <div class="sectiontitle" id="selectedTitle">今日の予定</div>
+        <div class="subdate" id="selectedSub"></div>
+      </div>
+      <button class="addsmall" id="openAdd">＋ 予定を追加</button>
+    </div>
+    <div class="eventlist" id="eventList"></div>
+  </section>
+</div>
+
+<button class="fab" id="fab" aria-label="予定を追加">＋</button>
+
+<nav class="bottomnav" aria-label="メニュー">
+  <button class="navitem active" data-tab="calendar">
+    <span class="navicon">▦</span><span>カレンダー</span>
+  </button>
+  <button class="navitem" data-tab="list">
+    <span class="navicon">☷</span><span>予定一覧</span>
+  </button>
+  <button class="navitem" data-tab="today">
+    <span class="navicon">◷</span><span>今日</span>
+  </button>
+  <button class="navitem" data-tab="settings">
+    <span class="navicon">⚙</span><span>設定</span>
+  </button>
+</nav>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="grabber"></div>
+    <div class="sheethead">
+      <div class="sheettitle" id="formTitle">新しい予定</div>
+      <button class="close" id="closeSheet" aria-label="閉じる">×</button>
+    </div>
+
+    <form id="eventForm">
+      <label class="field">
+        <span>予定のタイトル *</span>
+        <input id="titleInput" maxlength="120" required placeholder="例：合唱の練習">
+      </label>
+
+      <div class="two">
+        <label class="field">
+          <span>日付</span>
+          <input id="dateInput" type="date" required>
+        </label>
+        <label class="field">
+          <span>場所</span>
+          <input id="locationInput" maxlength="150" placeholder="場所（任意）">
+        </label>
+      </div>
+
+      <div class="two">
+        <label class="field">
+          <span>開始時刻</span>
+          <input id="startInput" type="time" value="09:00">
+        </label>
+        <label class="field">
+          <span>終了時刻</span>
+          <input id="endInput" type="time" value="10:00">
+        </label>
+      </div>
+
+      <label class="field">
+        <span>メモ</span>
+        <textarea id="notesInput" maxlength="1000" placeholder="持ち物や詳細など"></textarea>
+      </label>
+
+      <div class="field">
+        <span style="display:block;font-size:12px;color:#687184;font-weight:700;margin-bottom:9px">予定の色</span>
+        <div class="colors" id="colors">
+          <button type="button" class="colorpick chosen" data-color="#3478f6" style="background:#3478f6" aria-label="青"></button>
+          <button type="button" class="colorpick" data-color="#30b889" style="background:#30b889" aria-label="緑"></button>
+          <button type="button" class="colorpick" data-color="#f4a340" style="background:#f4a340" aria-label="オレンジ"></button>
+          <button type="button" class="colorpick" data-color="#ed6c91" style="background:#ed6c91" aria-label="ピンク"></button>
+          <button type="button" class="colorpick" data-color="#9a78e8" style="background:#9a78e8" aria-label="紫"></button>
+          <button type="button" class="colorpick" data-color="#7b8798" style="background:#7b8798" aria-label="グレー"></button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" id="cancelForm">キャンセル</button>
+        <button type="submit" class="primary">保存する</button>
+      </div>
+
+      <div class="actions" id="deleteRow" style="display:none">
+        <button type="button" class="danger" id="deleteEvent" style="width:100%">この予定を削除</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
