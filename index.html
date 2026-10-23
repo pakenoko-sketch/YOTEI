@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eef6ff">
+  <title>マイカレンダー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="subheading">MY CALENDAR</div>
+      <h1 id="monthTitle">カレンダー</h1>
+    </div>
+    <button class="round-button" id="todayBtn">今日</button>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <button id="prevBtn" aria-label="前へ">‹</button>
+      <button id="nextBtn" aria-label="次へ">›</button>
+      <div class="view-switch">
+        <button class="active" data-view="month">月</button>
+        <button data-view="week">週</button>
+        <button data-view="day">日</button>
+        <button data-view="list">リスト</button>
+      </div>
+    </section>
+
+    <section class="calendar-card">
+      <div class="weekdays">
+        <span>日</span><span>月</span><span>火</span>
+        <span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
+    <section class="agenda-section">
+      <div class="section-heading">
+        <div>
+          <div class="subheading">SCHEDULE</div>
+          <h2 id="selectedDateTitle">予定</h2>
+        </div>
+        <button id="addEventBtn" class="primary-button">＋ 予定を追加</button>
+      </div>
+      <div id="eventList"></div>
+    </section>
+
+    <section class="travel-card">
+      <div class="section-heading">
+        <div>
+          <div class="subheading">TRAVEL TIME</div>
+          <h2>移動時間</h2>
+        </div>
+        <button id="managePlacesBtn" class="secondary-button">場所リスト</button>
+      </div>
+      <p class="muted">出発地と目的地を選び、地図で経路を確認できます。</p>
+      <button id="openTravelBtn" class="primary-button full-button">
+        移動時間を調べる
+      </button>
+    </section>
+
+    <section class="settings-card">
+      <h2>データ管理</h2>
+      <div class="button-row">
+        <button id="exportBtn" class="secondary-button">バックアップ</button>
+        <button id="importBtn" class="secondary-button">復元</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+      <p class="muted">予定と登録した場所は、この端末のブラウザに保存されます。</p>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="calendarNav">
+      <span>▦</span>カレンダー
+    </button>
+    <button class="nav-item" id="travelNav">
+      <span>↗</span>移動時間
+    </button>
+    <button class="nav-item" id="placesNav">
+      <span>⌖</span>場所リスト
+    </button>
+  </nav>
+
+  <!-- 予定の追加・編集 -->
+  <dialog id="eventDialog">
+    <form id="eventForm">
+      <div class="dialog-heading">
+        <h2 id="eventDialogTitle">予定を追加</h2>
+        <button type="button" class="close-button" data-close="eventDialog">×</button>
+      </div>
+
+      <input type="hidden" id="eventId">
+
+      <label>予定の名前
+        <input id="eventTitle" required placeholder="例：合唱の練習">
+      </label>
+
+      <label class="inline-label">
+        <input type="checkbox" id="eventAllDay">
+        終日
+      </label>
+
+      <div class="form-grid">
+        <label>開始日
+          <input type="date" id="eventStartDate" required>
+        </label>
+        <label>開始時刻
+          <input type="time" id="eventStartTime" value="09:00">
+        </label>
+        <label>終了日
+          <input type="date" id="eventEndDate" required>
+        </label>
+        <label>終了時刻
+          <input type="time" id="eventEndTime" value="10:00">
+        </label>
+      </div>
+
+      <label>繰り返し
+        <select id="eventRepeat">
+          <option value="none">繰り返さない</option>
+          <option value="daily">毎日</option>
+          <option value="weekly">毎週</option>
+          <option value="monthly">毎月</option>
+          <option value="yearly">毎年</option>
+        </select>
+      </label>
+
+      <label>予定の場所
+        <select id="eventPlace">
+          <option value="">場所を選択（任意）</option>
+        </select>
+      </label>
+
+      <label>住所・場所の詳細
+        <input id="eventLocation" placeholder="住所や施設名">
+      </label>
+
+      <label>メモ
+        <textarea id="eventNotes" rows="3" placeholder="持ち物など"></textarea>
+      </label>
+
+      <div class="travel-editor">
+        <h3>この予定の移動時間</h3>
+        <p class="muted">場所リストから出発地・目的地を選んで保存できます。</p>
+
+        <label>出発地
+          <select id="eventOrigin"></select>
+        </label>
+        <label>目的地
+          <select id="eventDestination"></select>
+        </label>
+        <label>移動方法
+          <select id="eventTravelMode">
+            <option value="driving">車</option>
+            <option value="walking">徒歩</option>
+            <option value="transit">電車・バス</option>
+          </select>
+        </label>
+        <label>移動時間（分）
+          <input id="eventTravelMinutes" type="number" min="0" max="1440" placeholder="地図で確認して入力">
+        </label>
+        <button type="button" id="eventRouteBtn" class="secondary-button full-button">
+          地図で経路を確認
+        </button>
+        <div id="eventDepartureHint" class="hint"></div>
+      </div>
+
+      <label>予定の色
+        <select id="eventColor">
+          <option value="#4388ed">ブルー</option>
+          <option value="#e779a8">ピンク</option>
+          <option value="#43a88b">グリーン</option>
+          <option value="#e6a23c">オレンジ</option>
+          <option value="#9a79dc">パープル</option>
+        </select>
+      </label>
+
+      <div class="button-row">
+        <button type="submit" class="primary-button">保存</button>
+        <button type="button" id="deleteEventBtn" class="danger-button">削除</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 移動時間検索 -->
+  <dialog id="travelDialog">
+    <form id="travelForm">
+      <div class="dialog-heading">
+        <h2>移動時間を調べる</h2>
+        <button type="button" class="close-button" data-close="travelDialog">×</button>
+      </div>
+
+      <label>出発地
+        <select id="travelOrigin" required></select>
+      </label>
+      <label>目的地
+        <select id="travelDestination" required></select>
+      </label>
+      <label>移動方法
+        <select id="travelMode">
+          <option value="driving">車</option>
+          <option value="walking">徒歩</option>
+          <option value="transit">電車・バス</option>
+        </select>
+      </label>
+      <label>予定の開始時刻（任意）
+        <input type="datetime-local" id="travelArrival">
+      </label>
+
+      <button type="submit" class="primary-button full-button">Google Mapsで経路を開く</button>
+      <p class="muted">地図に表示された所要時間を、下の欄に入力してください。</p>
+
+      <label>移動時間（分）
+        <input type="number" id="travelMinutes" min="0" max="1440" placeholder="例：35">
+      </label>
+      <div id="travelResult" class="result-panel" hidden></div>
+
+      <button type="button" id="saveTravelBtn" class="primary-button full-button">
+        移動時間を保存
+      </button>
+      <p class="muted">保存すると、選択中の日の予定に移動情報を追加できます。</p>
+    </form>
+  </dialog>
+
+  <!-- 場所リストの管理 -->
+  <dialog id="placesDialog">
+    <form id="placeForm">
+      <div class="dialog-heading">
+        <h2>場所リスト</h2>
+        <button type="button" class="close-button" data-close="placesDialog">×</button>
+      </div>
+
+      <p class="muted">よく使う場所を登録すると、移動時間や予定から選べます。</p>
+      <input type="hidden" id="placeId">
+
+      <label>場所の名前
+        <input id="placeName" required placeholder="例：自宅">
+      </label>
+      <label>住所・施設名
+        <input id="placeAddress" required placeholder="例：山口県山口市〇〇">
+      </label>
+      <div class="button-row">
+        <button type="submit" class="primary-button">場所を保存</button>
+        <button type="button" id="cancelPlaceEditBtn" class="secondary-button">入力をクリア</button>
+      </div>
+
+      <div id="placesList" class="places-list"></div>
+    </form>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
